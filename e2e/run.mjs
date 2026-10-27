@@ -1,6 +1,12 @@
 // Browsertests (Chromium via Playwright): installatie, offline starten, hervatten, opslagherstel en schermformaten.
 // Gebruik: npm run build && npm run test:browser   (vereist: npx playwright install chromium)
-import { chromium } from 'playwright';
+import { chromium, devices } from 'playwright';
+
+// Optioneel: DEVICE="Pixel 8" emuleert een Android-toestel (user agent, aanraking, mobiel scherm).
+const DEVICE = process.env.DEVICE && devices[process.env.DEVICE];
+if (process.env.DEVICE && !DEVICE) throw new Error('Onbekend toestel: ' + process.env.DEVICE);
+const { defaultBrowserType, ...deviceOpts } = DEVICE || {};
+const ctxOpts = (extra = {}) => (DEVICE ? { ...deviceOpts, ...extra } : { viewport: { width: 390, height: 844 }, hasTouch: true, ...extra });
 import { spawn } from 'node:child_process';
 import { mkdtemp, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -49,8 +55,9 @@ const state = (page) => page.evaluate(() => JSON.parse(JSON.stringify(window.__s
 // ============================================================
 const profile = await mkdtemp(join(tmpdir(), 'spellenkast-'));
 let server = await startServer();
-let ctx = await chromium.launchPersistentContext(profile, { viewport: { width: 390, height: 844 }, hasTouch: true });
+let ctx = await chromium.launchPersistentContext(profile, ctxOpts());
 
+if (DEVICE) console.log(`Toestel: ${process.env.DEVICE} — ${deviceOpts.userAgent}`);
 console.log('\nInstallatie en eerste gebruik (online)');
 let page = await openApp(ctx);
 let saved2048;
@@ -103,7 +110,7 @@ await check('pagina scrollt niet door spelbewegingen', async () => {
 await ctx.close();
 server.kill();
 console.log('\nVolledig afsluiten, server uit, offline heropenen');
-ctx = await chromium.launchPersistentContext(profile, { viewport: { width: 390, height: 844 }, hasTouch: true, offline: true });
+ctx = await chromium.launchPersistentContext(profile, ctxOpts({ offline: true }));
 page = await openApp(ctx);
 
 await check('app start zonder netwerk en zonder server', async () => {
@@ -187,7 +194,7 @@ await ctx.close();
 
 console.log('\nApp-update: opgeslagen spellen blijven behouden');
 server = await startServer({ SPELLENKAST_TEST_VERSIE: 'update' });
-ctx = await chromium.launchPersistentContext(profile, { viewport: { width: 390, height: 844 }, hasTouch: true });
+ctx = await chromium.launchPersistentContext(profile, ctxOpts());
 page = await openApp(ctx);
 await check('nieuwe versie wordt gemeld, geactiveerd en saves blijven', async () => {
   const before = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).filter((k) => k.startsWith('spellenkast:')).map((k) => [k, localStorage.getItem(k)])));
