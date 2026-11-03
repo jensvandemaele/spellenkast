@@ -1,7 +1,7 @@
 # Spellenkast
 
-Vier klassieke solospellen in één installeerbare webapp die na de eerste keer openen volledig offline werkt:
-**Blokval** (vallende blokken), **Woordzoeker**, **2048** en **Klondike**.
+Zeven klassieke solospellen in één installeerbare webapp die na de eerste keer openen volledig offline werkt:
+**Blokval** (vallende blokken), **Woordzoeker**, **2048**, **Klondike**, **Mijnenveger**, **Legpuzzel** en **Snoepwissel** (match-3).
 Nederlandstalig, geen account, geen advertenties, geen backend. Alles wordt alleen op het apparaat bewaard.
 
 ---
@@ -52,7 +52,7 @@ Let op: de beginscherm-app heeft **eigen opslag**, los van Safari. Voortgang uit
 
 ### Is internet nodig?
 
-Alleen bij de **eerste keer openen** (of bij een update): dan worden alle bestanden (± 180 kB) eenmalig binnengehaald. Daarna niet meer: geen CDN, geen woorden-API, geen externe lettertypen, geen geluidsbestanden (geluiden worden in de browser gesynthetiseerd).
+Alleen bij de **eerste keer openen** (of bij een update): dan worden alle bestanden (± 320 kB) eenmalig binnengehaald. Daarna niet meer: geen CDN, geen woorden-API, geen externe lettertypen, geen geluidsbestanden (geluiden worden in de browser gesynthetiseerd) en geen afbeeldingsbestanden (de puzzelafbeeldingen worden in de browser getekend).
 
 ## 3. Opslag: wat je moet weten
 
@@ -69,6 +69,8 @@ Alleen bij de **eerste keer openen** (of bij een update): dan worden alle bestan
 
 **Reservekopie:** Instellingen (⚙︎) → *Reservekopie maken* bewaart alles als JSON-bestand; *Terugzetten* zet het terug, ook op een ander apparaat. Synchronisatie tussen apparaten zit niet in deze versie.
 
+**Eigen foto (Legpuzzel):** de gekozen foto wordt vierkant bijgesneden, verkleind tot hooguit 960×960 pixels en als JPEG (maximaal ± 0,9 MB) in de voorkeuren van de Legpuzzel bewaard, alleen op dit apparaat. Hij zit dus ook in de reservekopie. Een nieuwe foto vervangt de vorige.
+
 ## 4. De spellen
 
 | Spel | Bediening | Bijzonderheden |
@@ -77,6 +79,9 @@ Alleen bij de **eerste keer openen** (of bij een update): dan worden alle bestan
 | **Woordzoeker** | Slepen (vinger/muis), tik-tik (eerste en laatste letter), toetsenbord (pijltjes + Enter) | 8 thema's met ± 300 Nederlandse woorden, 3 niveaus (8×8 → 12×12, tot 8 richtingen), elk woord staat gegarandeerd precies één keer in het rooster, tijd en beste tijden per niveau |
 | **2048** | Vegen, pijltjestoetsen of W A S D | Elke tegel voegt hooguit één keer per zet samen, nieuwe tegel alleen na een geldige zet, winst bij 2048 met doorspelen, game-over, beste score |
 | **Klondike** | Slepen, of tik kaart → tik bestemming; nogmaals tikken = automatisch verplaatsen; Tab + Enter; Ctrl/⌘+Z | Eén kaart trekken, onbeperkt doorlopen, ongedaan maken (100 stappen, ook na hervatten), automatisch afmaken, winst- en tijdstatistiek |
+| **Mijnenveger** | Tikken/klikken opent; vlag met lang indrukken, rechtsklik of de knop *Vlag*; tik op een getal = buren openen (akkoord); pijltjes + Enter, F voor vlag | 3 niveaus (9×9/10, 12×12/24, 16×16/40 mijnen), eerste tik altijd veilig en opent een gebied, mijnteller, tijd en beste tijden per niveau, na verlies het bord bekijken |
+| **Legpuzzel** | Stukjes slepen (vinger of muis); *Voorbeeld*, *Opruimen*, *Eigen foto* | Echte puzzelstukjes met nopjes (elke puzzel een andere snit), 6 zelf getekende afbeeldingen die per puzzel variëren, of een eigen foto; 4 niveaus (3×3 tot 6×6), vastklikken op de juiste plek, tijd en beste tijden per niveau |
+| **Snoepwissel** | Vegen, of tik-tik op twee buren; pijltjes + Enter + pijltje | 8×8 match-3 met cascades, streepsnoepjes (4 op een rij), bommen (L/T), kleurbommen (5 op een rij) en combinaties daarvan; niveaus met zetten en doelscore, 1–3 sterren, tip na 7 seconden, automatisch schudden als er geen zet meer is |
 
 Elk spel heeft een **?**-knop met een korte uitleg van de regels. **Nieuw** vraagt eerst bevestiging als er een spel bezig is.
 
@@ -100,6 +105,7 @@ app/                       ← dit is de volledige app (deze map host je)
   js/games/registry.js     lijst van spellen
   js/games/<spel>/logic.js spelregels: puur, zonder DOM → met unit tests
   js/games/<spel>/game.js  scherm en bediening van dat spel
+  js/games/legpuzzel/images.js  de zes puzzelafbeeldingen, getekend met canvas
 tools/serve.mjs            kleine webserver zonder afhankelijkheden
 tools/build-sw.mjs         werkt offline-bestandenlijst + versie in sw.js bij
 tools/make-icons.py        maakt de iconen opnieuw (Python + Pillow)
@@ -116,24 +122,25 @@ e2e/                       browsertests (Playwright/Chromium)
 ## 6. Testen
 
 ```bash
-npm test                 # 57 unit tests: spelregels en opslag (alleen Node nodig)
+npm test                 # 101 unit tests: spelregels en opslag (alleen Node nodig)
 npm install              # eenmalig, voor de browsertests
 npx playwright install chromium
-npm run build && npm run test:browser   # 61 browsercontroles, schermafbeeldingen in e2e/screenshots/
+npm run build && npm run test:browser   # 96 browsercontroles, schermafbeeldingen in e2e/screenshots/
 ```
 
 ### Uitgevoerde tests (in deze oplevering, allemaal geslaagd)
 
-**Unit tests (57)** — o.a.: 2048-samenvoegregels ([2,2,2,2]→[4,4], [4,4,8]→[8,8]), geen tegel na ongeldige zet, winst één keer, game-over; Blokval-bewegen, draaien met muurschoppen, 7-zak, rijen wissen en scoren, niveau, game-over; Woordzoeker: 288 gegenereerde puzzels over alle thema's en niveaus gecontroleerd op geldigheid en "elk woord precies één keer", selectie voor- en achteruit, voltooiing; Klondike: delen (52 unieke kaarten, 1–7, 24 in de stapel), trekken en terugdraaien, alle plaatsingsregels, reeksen, omdraaien, winst, automatisch afmaken, ongedaan-maken-momentopnamen; opslag: ontbrekend, kapotte JSON, verkeerde structuur, ongeldige gegevens, migratie, mislukte migratie, nieuwer formaat, volle opslag, geen opslag, reservekopie.
+**Unit tests (101)** — o.a.: 2048-samenvoegregels ([2,2,2,2]→[4,4], [4,4,8]→[8,8]), geen tegel na ongeldige zet, winst één keer, game-over; Blokval-bewegen, draaien met muurschoppen, 7-zak, rijen wissen en scoren, niveau, game-over; Woordzoeker: 288 gegenereerde puzzels over alle thema's en niveaus gecontroleerd op geldigheid en "elk woord precies één keer", selectie voor- en achteruit, voltooiing; Klondike: delen (52 unieke kaarten, 1–7, 24 in de stapel), trekken en terugdraaien, alle plaatsingsregels, reeksen, omdraaien, winst, automatisch afmaken, ongedaan-maken-momentopnamen; opslag: ontbrekend, kapotte JSON, verkeerde structuur, ongeldige gegevens, migratie, mislukte migratie, nieuwer formaat, volle opslag, geen opslag, reservekopie; Mijnenveger: mijnen leggen (eerste tik + buren vrij, 200 seeds), eerste tik altijd veilig op alle niveaus, tellingen, overstroming, vlaggen, akkoord (ook met verkeerde vlag), winst en verlies; Legpuzzel: buurstukjes hebben exact dezelfde randlijn (alle niveaus), nopjes binnen de marge, rechte buitenranden, vastklikken, uitstrooien, opruimen; Snoepwissel: rijtjes en L/T-groepen, welk speciaal snoepje waar ontstaat, geldige wissels, alle combinaties van speciale snoepjes, schudden, tip, honderden gesimuleerde zetten zonder gaten of dubbele snoepjes, en de moeilijkheidscurve (een eenvoudige computerspeler haalt niveau 1 vrijwel altijd); kapotte standen worden voor alle spellen geweigerd.
 
-**Browsertests (61, Chromium headless, aanraak-emulatie)** — service worker cachet alles; alle vier spellen speelbaar met toetsenbord, muis en aanraking; **browser volledig afgesloten, server uit, netwerk uit → app en alle vier spellen starten**; hervatten geeft exact dezelfde stand (ook Klondike met ongedaan-geschiedenis); bevestiging bij nieuw spel; beschadigde opslag (drie records) leidt tot schone start zonder crash; app-update wordt gemeld, geactiveerd en laat alle opgeslagen gegevens ongemoeid; instellingen blijven bewaard; elk spel past zonder horizontaal scrollen op 320×568, 375×667, 1280×800 en liggend 844×390; donkere weergave.
+**Browsertests (96, Chromium headless, aanraak-emulatie)** — service worker cachet alles; alle zeven spellen speelbaar met toetsenbord, muis en aanraking (Mijnenveger: lang indrukken, rechtsklik en vlagknop; Legpuzzel: slepen, vastklikken, eigen foto kiezen; Snoepwissel: vegen, tik-tik, ongeldige wissel, niveau gehaald en mislukt); **browser volledig afgesloten, server uit, netwerk uit → app en alle zeven spellen starten**; hervatten geeft exact dezelfde stand (ook Klondike met ongedaan-geschiedenis); bevestiging bij nieuw spel; beschadigde opslag (drie records) leidt tot schone start zonder crash; app-update wordt gemeld, geactiveerd en laat alle opgeslagen gegevens ongemoeid; instellingen blijven bewaard; elk spel past zonder horizontaal scrollen op 320×568, 375×667, 1280×800 en liggend 844×390; donkere weergave.
 
 ### Nog te doen op echte apparaten (niet door mij uitgevoerd)
 
 Er is in deze omgeving geen Safari/WebKit en geen fysiek toestel beschikbaar. Controleer daarom zelf:
 
 - [ ] iPhone (Safari, iOS 16.4 of nieuwer): installeren via *Zet op beginscherm*, daarna in vliegtuigmodus openen, app volledig afsluiten (omhoog vegen) en opnieuw openen.
-- [ ] iPhone: vegen in 2048, slepen in Woordzoeker en Klondike, knoppen ingedrukt houden in Blokval; controleren dat de pagina niet meeschuift of inzoomt.
+- [ ] iPhone: vegen in 2048 en Snoepwissel, slepen in Woordzoeker, Klondike en Legpuzzel, knoppen ingedrukt houden in Blokval, lang indrukken voor een vlag in Mijnenveger; controleren dat de pagina niet meeschuift, inzoomt of een tekstmenu toont.
+- [ ] iPhone: Legpuzzel → *Eigen foto* opent de fotobibliotheek en de puzzel verschijnt (ook met een HEIC-foto).
 - [ ] iPhone: geluid (let op: de stille-modusschakelaar dempt webgeluid).
 - [ ] Windows (Chrome/Edge) en macOS (Safari/Chrome): installeren, offline openen na herstart van de computer.
 - [ ] Notch/Dynamic Island en de onderbalk van de iPhone in staande en liggende stand.
@@ -145,6 +152,9 @@ Er is in deze omgeving geen Safari/WebKit en geen fysiek toestel beschikbaar. Co
 - Klondike: alleen "één kaart trekken" (zoals gevraagd); geen hint-functie.
 - Blokval: geen "vasthouden" van een blok en geen T-spin-bonussen (bewust eenvoudig gehouden).
 - Woordzoeker: woorden zonder accenten; IJ telt als twee letters (I + J).
+- Mijnenveger: op *Moeilijk* (16×16) zijn de vakjes op een telefoon klein (± 20 px); geen zoom.
+- Legpuzzel: stukjes draaien niet en klikken alleen vast op hun eigen plek op het bord (niet onderling tot groepjes buiten het bord). Eén eigen foto tegelijk.
+- Snoepwissel: niveaus hebben alleen een doelscore (geen blokkades, gelei of verzameldoelen), en er is geen eindbonus voor overgebleven zetten.
 
 ## 8. Een spel toevoegen
 

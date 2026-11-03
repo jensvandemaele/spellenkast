@@ -5,8 +5,11 @@ import blokval from './blokval/game.js';
 import woordzoeker from './woordzoeker/game.js';
 import g2048 from './g2048/game.js';
 import klondike from './klondike/game.js';
+import mijnenveger from './mijnenveger/game.js';
+import legpuzzel from './legpuzzel/game.js';
+import snoepwissel from './snoepwissel/game.js';
 
-export const GAMES = [blokval, woordzoeker, g2048, klondike];
+export const GAMES = [blokval, woordzoeker, g2048, klondike, mijnenveger, legpuzzel, snoepwissel];
 
 export function findGame(id) {
   return GAMES.find((g) => g.id === id) || null;

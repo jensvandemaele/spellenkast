@@ -10,6 +10,9 @@ const SOUNDS = {
   fout:     [{ f: 160, d: 0.12, type: 'sawtooth', g: 0.035 }],
   kaart:    [{ f: 900, d: 0.025, type: 'triangle', g: 0.06 }],
   winst:    [{ f: 523, d: 0.12, type: 'triangle', g: 0.12 }, { f: 659, d: 0.12, type: 'triangle', g: 0.12, at: 0.12 }, { f: 784, d: 0.12, type: 'triangle', g: 0.12, at: 0.24 }, { f: 1047, d: 0.3, type: 'triangle', g: 0.12, at: 0.36 }],
+  vlag:     [{ f: 740, d: 0.05, type: 'square', g: 0.035 }, { f: 990, d: 0.05, type: 'square', g: 0.03, at: 0.04 }],
+  plop:     [{ f: 420, d: 0.05, type: 'sine', g: 0.12 }, { f: 640, d: 0.07, type: 'sine', g: 0.08, at: 0.03 }],
+  boem:     [{ f: 90, d: 0.25, type: 'sawtooth', g: 0.06 }, { f: 60, d: 0.3, type: 'sine', g: 0.12, at: 0.02 }],
   einde:    [{ f: 392, d: 0.18, type: 'sine', g: 0.1 }, { f: 330, d: 0.18, type: 'sine', g: 0.1, at: 0.16 }, { f: 262, d: 0.3, type: 'sine', g: 0.1, at: 0.32 }],
 };
 

@@ -7,7 +7,7 @@ import { showDialog, confirmDialog, toast, overlay, clearOverlay } from './core/
 import { el } from './core/util.js';
 import { GAMES, findGame } from './games/registry.js';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
 
 const storage = createStorage();
 const settings = createSettings(storage);

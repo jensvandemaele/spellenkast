@@ -2,7 +2,7 @@
 // De lijst hieronder wordt bijgewerkt door `node tools/build-sw.mjs` (draai dat na elke wijziging).
 
 // <<PRECACHE>>
-const VERSION = 'be2f8c4c3999';
+const VERSION = '4c9ec08d7130';
 const ASSETS = [
   "./",
   "./css/app.css",
@@ -25,7 +25,14 @@ const ASSETS = [
   "./js/games/g2048/logic.js",
   "./js/games/klondike/game.js",
   "./js/games/klondike/logic.js",
+  "./js/games/legpuzzel/game.js",
+  "./js/games/legpuzzel/images.js",
+  "./js/games/legpuzzel/logic.js",
+  "./js/games/mijnenveger/game.js",
+  "./js/games/mijnenveger/logic.js",
   "./js/games/registry.js",
+  "./js/games/snoepwissel/game.js",
+  "./js/games/snoepwissel/logic.js",
   "./js/games/woordzoeker/game.js",
   "./js/games/woordzoeker/logic.js",
   "./js/games/woordzoeker/words.js",
